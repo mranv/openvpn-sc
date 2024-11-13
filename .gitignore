@@ -1,0 +1,28 @@
+# Operating System Files
+.DS_Store
+Thumbs.db
+
+# Editor Files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Logs
+*.log
+
+# Temporary files
+*.tmp
+*.bak
+
+# Configuration files with sensitive data
+config/*.conf
+!config/*.conf.template
+
+# Certificates and keys
+*.key
+*.crt
+*.pem
+
+# Environment variables
+.env
