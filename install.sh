@@ -7,13 +7,49 @@
 # Script directory
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
-# Source utility files
+# Create colors.sh if it doesn't exist
+create_colors_file() {
+    local utils_dir="${SCRIPT_DIR}/scripts/utils"
+    mkdir -p "$utils_dir"
+    
+    cat > "${utils_dir}/colors.sh" << 'EOF'
+# ANSI color codes
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+BLUE='\033[0;34m'
+NC='\033[0m' # No Color
+
+# Print functions
+print_header() {
+    echo -e "\n${BLUE}=== $1 ===${NC}"
+}
+
+print_success() {
+    echo -e "${GREEN}✓ $1${NC}"
+}
+
+print_warning() {
+    echo -e "${YELLOW}⚠ $1${NC}"
+}
+
+print_info() {
+    echo -e "${BLUE}ℹ $1${NC}"
+}
+EOF
+
+    chmod +x "${utils_dir}/colors.sh"
+}
+
+# Create and source colors file
+create_colors_file
 source "${SCRIPT_DIR}/scripts/utils/colors.sh"
 
 # Configuration
 INSTALL_DIR="/usr/local/bin"
 CONFIG_DIR="/etc/openvpn"
 SYSTEMD_DIR="/etc/systemd/system"
+UTILS_DIR="${INSTALL_DIR}/utils"
 
 # Progress spinner
 spinner() {
@@ -77,6 +113,7 @@ check_requirements() {
     
     # Check dependencies
     local deps=("curl" "wget" "openvpn")
+    MISSING_DEPS=()
     for dep in "${deps[@]}"; do
         if ! command -v "$dep" &> /dev/null; then
             MISSING_DEPS+=("$dep")
@@ -98,13 +135,13 @@ install_dependencies() {
     case $OS_TYPE in
         debian)
             {
-                apt-get update &> /dev/null && \
+                apt-get update &> /dev/null
                 apt-get install -y openvpn easy-rsa curl wget &> /dev/null
             } & spinner $! "Installing packages..."
             ;;
         redhat)
             {
-                yum install -y epel-release &> /dev/null && \
+                yum install -y epel-release &> /dev/null
                 yum install -y openvpn easy-rsa curl wget &> /dev/null
             } & spinner $! "Installing packages..."
             ;;
@@ -129,6 +166,7 @@ setup_directories() {
         "$CONFIG_DIR/ccd"
         "$CONFIG_DIR/clients"
         "/var/log/openvpn"
+        "$UTILS_DIR"
     )
     
     for dir in "${dirs[@]}"; do
@@ -142,6 +180,10 @@ setup_directories() {
 # Function to copy configuration files
 copy_configurations() {
     print_header "Copying Configuration Files"
+    
+    # Copy colors.sh to the installation directory
+    cp "${SCRIPT_DIR}/scripts/utils/colors.sh" "${UTILS_DIR}/"
+    chmod 644 "${UTILS_DIR}/colors.sh"
     
     # Verify source files exist
     if [ ! -f "${SCRIPT_DIR}/config/server.conf.template" ] || \
@@ -216,6 +258,7 @@ verify_installation() {
         "${INSTALL_DIR}/ovpn"
         "${CONFIG_DIR}/server.conf"
         "${CONFIG_DIR}/client-template.txt"
+        "${UTILS_DIR}/colors.sh"
     )
     
     for component in "${components[@]}"; do
