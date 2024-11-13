@@ -8,26 +8,11 @@ proto udp
 remote SERVER_IP 1194
 resolv-retry infinite
 nobind
-
-# Security settings
-cipher AES-256-GCM
-auth SHA384
-tls-version-min 1.2
-verify-x509-name server name
-
-# Certificate settings
-remote-cert-tls server
-key-direction 1
-
-# Performance & Stability
 persist-key
 persist-tun
-comp-lzo
+remote-cert-tls server
+cipher AES-256-GCM
+auth SHA384
+key-direction 1
 verb 3
-
-# DNS settings
-script-security 2
-up /etc/openvpn/update-resolv-conf
-down /etc/openvpn/update-resolv-conf
-
-# Additional custom settings can be added below
+tls-version-min 1.2
