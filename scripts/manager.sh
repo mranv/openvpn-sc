@@ -940,47 +940,6 @@ function installQuestions() {
         1) PROTOCOL="udp" ;;
         2) PROTOCOL="tcp" ;;
     esac
-    
-    # DNS selection
-    echo -e "\n${BLUE}DNS Provider Selection${NC}"
-    echo "1) Current system resolvers"
-    echo "2) Self-hosted DNS (Unbound)"
-    echo "3) Cloudflare (1.1.1.1)"
-    echo "4) Google (8.8.8.8)"
-    until [[ $DNS_CHOICE =~ ^[1-4]$ ]]; do
-        read -rp "Select DNS provider [1-4]: " -e -i 1 DNS_CHOICE
-    done
-    DNS=$DNS_CHOICE
-    
-    # IPv6 support
-    echo -e "\n${BLUE}IPv6 Support${NC}"
-    setupIPv6
-    if [[ $IPV6_SUPPORT == "y" ]]; then
-        echo "IPv6 support will be enabled"
-    else
-        echo "IPv6 support will be disabled"
-    fi
-    
-    # Compression
-    echo -e "\n${BLUE}Compression Settings${NC}"
-    echo "Note: Compression is not recommended due to VORACLE attack"
-    until [[ $COMPRESSION_ENABLED =~ (y|n) ]]; do
-        read -rp "Enable compression? [y/n]: " -e -i n COMPRESSION_ENABLED
-    done
-    
-    # Final confirmation
-    echo -e "\n${BOLD}Configuration Summary:${NC}"
-    echo "Port: $PORT"
-    echo "Protocol: $PROTOCOL"
-    echo "DNS: $([ $DNS -eq 2 ] && echo 'Self-hosted' || echo 'External')"
-    echo "IPv6: $([ $IPV6_SUPPORT == 'y' ] && echo 'Enabled' || echo 'Disabled')"
-    echo "Compression: $([ $COMPRESSION_ENABLED == 'y' ] && echo 'Enabled' || echo 'Disabled')"
-    
-    echo ""
-    read -rp "Continue with installation? [y/n]: " -e -i y CONTINUE
-    if [[ $CONTINUE != "y" ]]; then
-        exit 1
-    fi
 }
 
 # Main menu function
